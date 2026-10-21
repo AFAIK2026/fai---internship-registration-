@@ -7,6 +7,10 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { startServer } from '../../scripts/serve.mjs';
+import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { build } from '../../scripts/build.mjs';
 
 const FORM_URL =
   'https://docs.google.com/forms/d/e/1FAIpQLSfV8tXTNl-DZL3wUmJ3H5sneP9l2mHm-9_1l2xXnA9uinpBFg/viewform';
@@ -166,3 +170,28 @@ for (const [label, viewport] of [['mobile', MOBILE], ['desktop', DESKTOP]]) {
     await context.close();
   });
 }
+
+test('served from a GitHub Pages-style subpath: styles load, links stay inside the base, 404 is styled', async () => {
+  const base = '/fai---internship-registration-/';
+  const outDir = await mkdtemp(join(tmpdir(), 'ire-pages-'));
+  assert.equal((await build({ outDir, base })).ok, true);
+  const pagesServer = await startServer({ dir: outDir, base });
+  const root = `http://127.0.0.1:${pagesServer.address().port}${base}`;
+  try {
+    const { context, page, errors } = await openPage({ viewport: DESKTOP });
+    await page.goto(root);
+    const ctaBackground = await page.locator('.hero .btn-primary').evaluate((el) => getComputedStyle(el).backgroundColor);
+    assert.equal(ctaBackground, 'rgb(29, 78, 216)', 'stylesheet must load under the base path');
+    await page.getByRole('navigation', { name: 'Page sections' }).getByRole('link', { name: 'How to apply' }).click();
+    await page.waitForURL(`${root}#apply`);
+    const response = await page.goto(`${root}some/missing/page`);
+    assert.equal(response.status(), 404);
+    assert.equal(await page.locator('.btn-secondary').evaluate((el) => getComputedStyle(el).borderTopStyle), 'solid', '404 page must be styled');
+    await page.getByRole('link', { name: 'Go to the internship page' }).click();
+    await page.waitForURL(root);
+    assert.deepEqual(errors.filter((e) => !e.includes('404')), []);
+    await context.close();
+  } finally {
+    pagesServer.close();
+  }
+});

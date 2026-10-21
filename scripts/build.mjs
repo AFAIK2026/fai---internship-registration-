@@ -1,6 +1,8 @@
 // Builds the static site into dist/.
 //   node scripts/build.mjs            preview build (placeholders allowed, listed as warnings)
 //   node scripts/build.mjs --release  release build (fails while any placeholder remains)
+// BASE_PATH sets the URL path the site is served from (default "/"), e.g.
+//   BASE_PATH=/fai---internship-registration-/ for a GitHub Pages project site.
 
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
@@ -11,20 +13,32 @@ import { renderIndex, renderNotFound } from '../src/render.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-export async function build({ release = false, contentPath = join(root, 'content/site.json'), outDir = join(root, 'dist') } = {}) {
+export function normalizeBase(value = '/') {
+  const base = `/${value}/`.replace(/\/{2,}/g, '/');
+  if (!/^\/([A-Za-z0-9._-]+\/)*$/.test(base)) throw new Error(`Invalid BASE_PATH: ${value}`);
+  return base;
+}
+
+export async function build({
+  release = false,
+  contentPath = join(root, 'content/site.json'),
+  outDir = join(root, 'dist'),
+  base = normalizeBase(process.env.BASE_PATH),
+} = {}) {
   const content = await loadContent(contentPath);
   const result = validateContent(content, { release });
   if (result.errors.length > 0) return { ok: false, ...result };
 
   const css = await readFile(join(root, 'src/styles.css'), 'utf8');
   const hash = createHash('sha256').update(css).digest('hex').slice(0, 10);
-  const stylesheet = `/assets/styles.${hash}.css`;
+  const cssFile = `assets/styles.${hash}.css`;
+  const stylesheet = `${base}${cssFile}`;
 
   await rm(outDir, { recursive: true, force: true });
   await mkdir(join(outDir, 'assets'), { recursive: true });
-  await writeFile(join(outDir, stylesheet), css);
-  await writeFile(join(outDir, 'index.html'), renderIndex(content, { stylesheet }));
-  await writeFile(join(outDir, '404.html'), renderNotFound(content, { stylesheet }));
+  await writeFile(join(outDir, cssFile), css);
+  await writeFile(join(outDir, 'index.html'), renderIndex(content, { stylesheet, base }));
+  await writeFile(join(outDir, '404.html'), renderNotFound(content, { stylesheet, base }));
   return { ok: true, ...result };
 }
 
@@ -41,5 +55,5 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     console.error(`Build failed (${release ? 'release' : 'preview'}).`);
     process.exit(1);
   }
-  console.log(`Built dist/ (${release ? 'release' : 'preview'} build).`);
+  console.log(`Built dist/ (${release ? 'release' : 'preview'} build, base path ${normalizeBase(process.env.BASE_PATH)}).`);
 }

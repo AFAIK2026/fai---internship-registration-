@@ -19,7 +19,13 @@ npm run test:e2e       # build, then browser tests of the applicant journey and 
 npm run build:release  # release build: fails while any placeholder content remains
 ```
 
-`dist/` is plain HTML and CSS and can be served by any static host.
+`dist/` is plain HTML and CSS and can be served by any static host. Set `BASE_PATH` when the site is served from a subpath, for example `BASE_PATH=/fai---internship-registration-/ npm run build`.
+
+## Deployment (GitHub Pages)
+
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml) runs on every push to `claude/internship-explorer-design-laa3qc`, and can also be started by hand from the Actions tab. It runs the unit and browser tests, builds with the Pages base path, and deploys only if every step passes. It currently publishes the **preview** build, so placeholder content is visible and marked; change the build step to `npm run build:release` once all content is approved.
+
+GitHub Pages can't set custom response headers, so the page-level security policy applies but header-only protections (`frame-ancestors`, HSTS settings) don't; see DEC-013 in the design. The `github.io` address is temporary: don't print it on QR codes.
 
 ## Updating content
 

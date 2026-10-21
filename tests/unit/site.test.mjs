@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { validateContent, expectedFormUrl } from '../../src/content.mjs';
 import { renderIndex, renderNotFound } from '../../src/render.mjs';
-import { build } from '../../scripts/build.mjs';
+import { build, normalizeBase } from '../../scripts/build.mjs';
 
 const CONTENT_PATH = new URL('../../content/site.json', import.meta.url);
 const FORM_URL =
@@ -189,4 +189,23 @@ test('build writes index, 404 and a content-hashed stylesheet, and refuses inval
   await writeFile(badContent, JSON.stringify(c));
   const failed = await build({ contentPath: badContent, outDir: join(badDir, 'dist') });
   assert.equal(failed.ok, false);
+});
+
+test('a base path prefixes every internal link and the stylesheet (GitHub Pages project site)', async () => {
+  const base = '/fai---internship-registration-/';
+  const html = renderIndex(await baseContent(), { stylesheet: `${base}assets/styles.test.css`, base });
+  assert.match(html, /href="\/fai---internship-registration-\/assets\/styles\.test\.css"/);
+  assert.match(html, /class="wordmark" href="\/fai---internship-registration-\/"/);
+  assert.match(html, /href="\/fai---internship-registration-\/#apply"/);
+  assert.doesNotMatch(html, /href="\/(?!fai---internship-registration-\/)/, 'no link may point outside the base path');
+  assert.match(renderNotFound(await baseContent(), { stylesheet: 'x', base }), /href="\/fai---internship-registration-\/">Go to the internship page/);
+});
+
+test('BASE_PATH is normalized and validated', () => {
+  assert.equal(normalizeBase(), '/');
+  assert.equal(normalizeBase(''), '/');
+  assert.equal(normalizeBase('fai---internship-registration-'), '/fai---internship-registration-/');
+  assert.equal(normalizeBase('/fai---internship-registration-/'), '/fai---internship-registration-/');
+  assert.throws(() => normalizeBase('/bad path/'));
+  assert.throws(() => normalizeBase('/"><script>/'));
 });

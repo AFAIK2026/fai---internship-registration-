@@ -47,7 +47,7 @@ Decisions and approvals still open (design D-09):
 | B-5 | Form access verified with an external applicant account | Form owner |
 | B-10 | Deadline rule and closure procedure | Program lead + maintainer |
 
-Nothing has been deployed, no domain has been connected, and no Google Form setting was changed.
+**Deployment (authorized by the project owner on 2026-10-21):** the preview build is published to GitHub Pages by `.github/workflows/pages.yml`, at a temporary `github.io` address, with placeholders visible. This choice of host is an interim decision. GitHub Pages can't set response headers, so the header controls in design §7.8 (DP-14) aren't available there; DEC-013 and DEC-006 still decide the long-term host. No custom domain is connected, and no Google Form setting was changed.
 
 ## Deferred: timestamp accuracy and the deadline tolerance
 

@@ -1,5 +1,7 @@
 // Minimal static server for local preview and tests. Serves dist/ and
 // returns 404.html with status 404 for unknown paths, like a static host.
+// With a base such as "/repo/", it serves the site under that path only,
+// the way GitHub Pages serves a project site.
 
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -15,9 +17,10 @@ const TYPES = {
   '.json': 'application/json',
 };
 
-export function startServer({ dir, port = 0, host = '127.0.0.1' }) {
+export function startServer({ dir, port = 0, host = '127.0.0.1', base = '/' }) {
   const server = createServer(async (req, res) => {
-    const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+    const requested = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+    const pathname = requested.startsWith(base) ? `/${requested.slice(base.length)}` : '/__outside_base__';
     const relative = pathname.endsWith('/') ? `${pathname}index.html` : pathname;
     const file = normalize(join(dir, relative));
     if (!file.startsWith(dir + sep)) {

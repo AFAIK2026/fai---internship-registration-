@@ -83,17 +83,17 @@ function list(items, className = '') {
   return `<ul${cls}>${items.map((item) => `<li>${text(item)}</li>`).join('')}</ul>`;
 }
 
-function renderHeader(content) {
+function renderHeader(content, base) {
   const cta = registerLink(content, { label: 'Register', size: 'sm', extraClass: 'header-cta' });
   return `<header class="site-header">
   <div class="container header-inner">
-    <a class="wordmark" href="/">${text(content.organization.name)}</a>
+    <a class="wordmark" href="${base}">${text(content.organization.name)}</a>
     <nav class="site-nav" aria-label="Page sections">
       <ul>
-        <li><a href="/#roles">Roles</a></li>
-        <li><a href="/#requirements">Requirements</a></li>
-        <li><a href="/#apply">How to apply</a></li>
-        <li><a href="/#contact">Contact</a></li>
+        <li><a href="${base}#roles">Roles</a></li>
+        <li><a href="${base}#requirements">Requirements</a></li>
+        <li><a href="${base}#apply">How to apply</a></li>
+        <li><a href="${base}#contact">Contact</a></li>
       </ul>
     </nav>
     ${cta}
@@ -101,13 +101,13 @@ function renderHeader(content) {
 </header>`;
 }
 
-function renderFooter(content) {
+function renderFooter(content, base) {
   const year = new Date(content.site.lastUpdated).getUTCFullYear();
   return `<footer class="site-footer">
   <div class="container footer-inner">
     <p>© ${year} ${text(content.organization.name)}</p>
     <p>Last updated ${escapeHtml(content.site.lastUpdated)}</p>
-    <p><a href="/#privacy">Privacy</a> · <a href="/#contact">Contact</a></p>
+    <p><a href="${base}#privacy">Privacy</a> · <a href="${base}#contact">Contact</a></p>
   </div>
 </footer>`;
 }
@@ -306,7 +306,7 @@ function renderPrivacy(content) {
 </section>`;
 }
 
-function page(content, { title, description, stylesheet, body }) {
+function page(content, { title, description, stylesheet, base, body }) {
   return `<!doctype html>
 <html lang="${escapeHtml(content.site.language)}">
 <head>
@@ -322,17 +322,18 @@ function page(content, { title, description, stylesheet, body }) {
 <body>
 <a class="skip-link" href="#main">Skip to main content</a>
 ${renderPreviewBanner(content)}
-${renderHeader(content)}
+${renderHeader(content, base)}
 <main id="main" tabindex="-1">
 ${body}
 </main>
-${renderFooter(content)}
+${renderFooter(content, base)}
 </body>
 </html>
 `;
 }
 
-export function renderIndex(content, { stylesheet }) {
+// base is the URL path the site is served from, e.g. "/" or "/repo-name/" on GitHub Pages.
+export function renderIndex(content, { stylesheet, base = '/' }) {
   const roles = publishedRoles(content);
   const body = [
     renderHero(content, roles.length),
@@ -348,17 +349,18 @@ export function renderIndex(content, { stylesheet }) {
     title: `${content.program.name} | ${content.organization.name}`,
     description: content.program.tagline,
     stylesheet,
+    base,
     body,
   });
 }
 
-export function renderNotFound(content, { stylesheet }) {
+export function renderNotFound(content, { stylesheet, base = '/' }) {
   const body = `<section class="hero" aria-labelledby="hero-title">
   <div class="container">
     <h1 id="hero-title">Page not found</h1>
     <p class="lead">This page doesn't exist. The internship information is on the home page.</p>
     <div class="hero-actions">
-      <a class="btn btn-secondary btn-md" href="/">Go to the internship page</a>
+      <a class="btn btn-secondary btn-md" href="${base}">Go to the internship page</a>
       ${registerLink(content, { label: 'Register now' })}
     </div>
   </div>
@@ -367,6 +369,7 @@ export function renderNotFound(content, { stylesheet }) {
     title: `Page not found | ${content.organization.name}`,
     description: content.program.tagline,
     stylesheet,
+    base,
     body,
   });
 }
