@@ -1,0 +1,86 @@
+{
+  "site": {
+    "language": "en",
+    "lastUpdated": "2026-10-21",
+    "url": null
+  },
+  "organization": {
+    "name": "[NEEDED: Organization name]"
+  },
+  "program": {
+    "name": "[NEEDED: Internship program name]",
+    "tagline": "[NEEDED: One-sentence description of the internship program for students]",
+    "overview": [
+      "[NEEDED: Short program overview approved by the program lead]"
+    ],
+    "facts": [
+      { "label": "Duration", "value": "[NEEDED: Program duration]" },
+      { "label": "Work setup", "value": "[NEEDED: Onsite, hybrid or remote]" }
+    ]
+  },
+  "registration": {
+    "status": "open",
+    "approvedFormId": "1FAIpQLSfV8tXTNl-DZL3wUmJ3H5sneP9l2mHm-9_1l2xXnA9uinpBFg",
+    "url": "https://docs.google.com/forms/d/e/1FAIpQLSfV8tXTNl-DZL3wUmJ3H5sneP9l2mHm-9_1l2xXnA9uinpBFg/viewform",
+    "timeZone": null,
+    "opensAt": null,
+    "closesAt": null,
+    "deadlineStatement": null,
+    "closedMessage": "Registration is closed.",
+    "notes": []
+  },
+  "roles": [
+    {
+      "slug": "placeholder-role-1",
+      "title": "[NEEDED: Title of role 1]",
+      "department": "[NEEDED: Team or department]",
+      "workSetup": null,
+      "location": null,
+      "summary": "[NEEDED: One- or two-sentence summary of role 1]",
+      "responsibilities": ["[NEEDED: Responsibility]"],
+      "requiredQualifications": ["[NEEDED: Required qualification]"],
+      "preferredQualifications": [],
+      "order": 1,
+      "published": true
+    },
+    {
+      "slug": "placeholder-role-2",
+      "title": "[NEEDED: Title of role 2]",
+      "department": "[NEEDED: Team or department]",
+      "workSetup": null,
+      "location": null,
+      "summary": "[NEEDED: One- or two-sentence summary of role 2]",
+      "responsibilities": ["[NEEDED: Responsibility]"],
+      "requiredQualifications": ["[NEEDED: Required qualification]"],
+      "preferredQualifications": [],
+      "order": 2,
+      "published": true
+    }
+  ],
+  "eligibility": {
+    "criteria": ["[NEEDED: Eligibility criterion approved by the program lead]"],
+    "documents": ["[NEEDED: Documents applicants should prepare, if any]"],
+    "unsureGuidance": null
+  },
+  "apply": {
+    "steps": [
+      "Choose a role that fits you.",
+      "Select Register now and complete the form on Google Forms. Your registration is only complete once you submit the form.",
+      "[NEEDED: What happens after applicants submit: approved next steps and timeline]"
+    ]
+  },
+  "contact": {
+    "email": "[NEEDED: Monitored contact email address]",
+    "location": null
+  },
+  "privacy": {
+    "controller": "[NEEDED: Data controller, confirmed by the privacy owner]",
+    "processor": "[NEEDED: Service provider that processes the form data, confirmed by the privacy owner]",
+    "purpose": "[NEEDED: Why registration data is collected]",
+    "retention": "[NEEDED: How long registration data is kept]",
+    "contact": "[NEEDED: Privacy contact]",
+    "policyUrl": null,
+    "approvalRef": "[NEEDED: Privacy notice approval reference]"
+  },
+  "faq": []
+}
